@@ -3,7 +3,7 @@ import React from "react";
 
 const Draw = () => {
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       Draw
       <Canvas />
     </div>
