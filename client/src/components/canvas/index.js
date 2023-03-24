@@ -3,6 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import fabric from "fabric";
 import { useFabricCanvas } from "@/hooks/useFabricCanvas";
 import { FabricContext } from "@/context/FabricContext";
+import {
+  registerCanvasEvents,
+  unRegisterCanvasEvents,
+} from "@/utils/canvas/events";
+
 const Canvas = () => {
   const fabricRefCallBack = useFabricCanvas();
   const canvasRef = useContext(FabricContext);
@@ -13,6 +18,13 @@ const Canvas = () => {
     return () => {
       // Remove event listener when component unmounts
       window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (canvasRef?.current) registerCanvasEvents(canvasRef);
+    return () => {
+      unRegisterCanvasEvents(canvasRef);
     };
   }, []);
 
