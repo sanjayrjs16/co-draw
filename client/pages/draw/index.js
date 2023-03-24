@@ -1,6 +1,6 @@
-import Canvas from "@/components/canvas";
-import LeftPanel from "@/components/LeftPanel";
-import Share from "@/components/Share";
+import Canvas from "../../src/components/canvas";
+import LeftPanel from "../../src/components/LeftPanel";
+import Share from "../../src/components/Share";
 import React from "react";
 
 const Draw = () => {

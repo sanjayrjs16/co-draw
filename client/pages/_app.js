@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "../src/styles/globals.css";
 import React from "react";
 import { FabricContext } from "@/context/FabricContext";
 import { ChakraProvider } from "@chakra-ui/react";
