@@ -30,6 +30,7 @@ io.on("connection", (socket) => {
       host.id = socket.id;
       host.name = name;
       socket.join(room);
+      // Storing the original host
       socket.emit("room-join-success", {
         message: `"Room creation successful!"`,
         room,
@@ -57,10 +58,15 @@ io.on("connection", (socket) => {
     }
   });
 
+  // socket.on("broadcast-room-members-to-all", function (roomData) {
+  //   io.to(room).emit("room-members-updates-list", roomData);
+  // });
+
   socket.on("send-canvas-room-data-to-new-joinee", function (data) {
     console.log("Recieved data from HOST", data.id);
     socket.to(data.id).emit("latest-room-canvas-data", data);
   });
+
   socket.on("leave-room", function (roomName, userName) {
     socket.leave(roomName);
     io.to(roomName).emit(
