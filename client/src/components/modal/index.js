@@ -48,7 +48,6 @@ const CustomModal = ({
       </ModalContent>
     </Modal>
   );
-  console.log("The JSX is ", element);
   return (
     <Modal size={"xl"} isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

@@ -1,3 +1,4 @@
+import { socketConnection } from "../socket";
 export const unRegisterCanvasEvents = (canvasRef, staticCanvasRef) => {
   const canvas = canvasRef.current;
   for (const key in canvas?.__eventListeners) {
@@ -6,12 +7,23 @@ export const unRegisterCanvasEvents = (canvasRef, staticCanvasRef) => {
     }
   }
 };
-export const registerCanvasEvents = (canvasRef, roomName = 10) => {
+const registerSocketUpdateCursorEvent = (roomName, x, y) => {
+  const socket = socketConnection.getSocketFunctions();
+  if (socket === null) return;
+  socket.emit("updateCursorPosition", {
+    roomName,
+    cursor: { x, y },
+  });
+};
+export const registerCanvasEvents = (canvasRef, roomName = null) => {
   const canvas = canvasRef?.current;
   canvas.on("mouse:down", function (opt) {
     // only fire this if socket is connected and is part of the room
   });
   canvas.on("mouse:move", function (opt) {
+    const pointer = canvas.getPointer(opt.e);
+    const x = pointer.x;
+    const y = pointer.y;
     if (this.isDragging) {
       var e = opt.e;
       var vpt = this.viewportTransform;
@@ -20,6 +32,9 @@ export const registerCanvasEvents = (canvasRef, roomName = 10) => {
       this.requestRenderAll();
       this.lastPosX = e.clientX;
       this.lastPosY = e.clientY;
+    }
+    if (roomName) {
+      registerSocketUpdateCursorEvent(roomName, x, y);
     }
   });
   canvas.on("mouse:up", function (opt) {

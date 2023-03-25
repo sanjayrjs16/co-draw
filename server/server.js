@@ -14,10 +14,11 @@ const STATIC_CHANNELS = ["global_notifications", "global_chat"];
 // http.listen(PORT, () => {
 //   console.log(`listening on *:${PORT}`);
 // });
+const cursorPositions = {};
 
 io.on("connection", (socket) => {
   /* socket object may be used to send specific messages to the new connected client */
-
+  cursorPositions[socket.id] = null;
   socket.emit("connection", null);
 
   socket.on("create-room", function (room, name) {
@@ -30,6 +31,7 @@ io.on("connection", (socket) => {
       host.id = socket.id;
       host.name = name;
       socket.join(room);
+      cursorPositions[socket.id] = { x: 0, y: 0 };
       // Storing the original host
       socket.emit("room-join-success", {
         message: `"Room creation successful!"`,
@@ -67,6 +69,13 @@ io.on("connection", (socket) => {
     socket.to(data.id).emit("latest-room-canvas-data", data);
   });
 
+  socket.on("updateCursorPosition", function (data) {
+    const { roomName, cursor } = data;
+    cursorPositions[socket.id] = cursor;
+    socket
+      .to(roomName)
+      .emit("cursor-position-update", { id: socket.id, cursor, roomName });
+  });
   socket.on("leave-room", function (roomName, userName) {
     socket.leave(roomName);
     io.to(roomName).emit(

@@ -120,7 +120,6 @@ const Share = () => {
   const toast = useToast();
   useEffect(() => {
     if (requestConnection) {
-      console.log("firing establishConnection");
       establishConnection();
     }
   }, [requestConnection]);
@@ -183,7 +182,6 @@ const Share = () => {
 
     socket.on("latest-room-canvas-data", function (data) {
       const { roomData, id } = data;
-      console.log("recieved room data", roomData);
       canvasRef?.current?.loadFromJSON(
         data.canvas,
         function () {
@@ -201,6 +199,7 @@ const Share = () => {
       {userData?.connectionStatus ? (
         <div style={{ display: "flex", flexDirection: "column" }}>
           Connected
+          <Button variant={"solid"}>Disconnect</Button>
           {roomData.map((member) => {
             return (
               <div>
