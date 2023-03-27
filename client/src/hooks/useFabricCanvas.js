@@ -1,5 +1,6 @@
 import React, { useRef, useCallback } from "react";
 import { FabricContext } from "@/context/FabricContext";
+
 import { fabric } from "fabric";
 export const useFabricCanvas = () => {
   const canvas = React.useContext(FabricContext);
