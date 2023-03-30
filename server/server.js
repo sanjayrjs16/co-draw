@@ -14,10 +14,11 @@ const STATIC_CHANNELS = ["global_notifications", "global_chat"];
 // http.listen(PORT, () => {
 //   console.log(`listening on *:${PORT}`);
 // });
+const cursorPositions = {};
 
 io.on("connection", (socket) => {
   /* socket object may be used to send specific messages to the new connected client */
-
+  cursorPositions[socket.id] = null;
   socket.emit("connection", null);
 
   socket.on("create-room", function (room, name) {
@@ -30,6 +31,8 @@ io.on("connection", (socket) => {
       host.id = socket.id;
       host.name = name;
       socket.join(room);
+      cursorPositions[socket.id] = { x: 0, y: 0 };
+      // Storing the original host
       socket.emit("room-join-success", {
         message: `"Room creation successful!"`,
         room,
@@ -57,9 +60,21 @@ io.on("connection", (socket) => {
     }
   });
 
+  // socket.on("broadcast-room-members-to-all", function (roomData) {
+  //   io.to(room).emit("room-members-updates-list", roomData);
+  // });
+
   socket.on("send-canvas-room-data-to-new-joinee", function (data) {
     console.log("Recieved data from HOST", data.id);
     socket.to(data.id).emit("latest-room-canvas-data", data);
+  });
+
+  socket.on("updateCursorPosition", function (data) {
+    const { roomName, cursor } = data;
+    cursorPositions[socket.id] = cursor;
+    socket
+      .to(roomName)
+      .emit("cursor-position-update", { id: socket.id, cursor, roomName });
   });
   socket.on("leave-room", function (roomName, userName) {
     socket.leave(roomName);
@@ -84,5 +99,18 @@ io.on("connection", (socket) => {
     console.log(coords, id);
     // socket.broadcast.emit("mouse_position_update", data);
     socket.to(roomName).emit("mouse_position_update", { coords, roomName, id });
+  });
+
+  socket.on("OBJECT_ADD", function ({ roomName, object, userId }) {
+    console.log("inside server", roomName, userId);
+    socket.to(roomName).emit("OBJECT_ADD", { roomName, object, userId });
+  });
+
+  socket.on("OBJECT_MODIFY", function ({ roomName, object }) {
+    socket.to(roomName).emit("OBJECT_MODIFY", { roomName, object });
+  });
+
+  socket.on("OBJECT_REMOVE", function ({ roomName, object }) {
+    socket.to(roomName).emit("OOBJECT_REMOVE", { roomName, object });
   });
 });

@@ -1,5 +1,6 @@
 import React, { useRef, useCallback } from "react";
 import { FabricContext } from "@/context/FabricContext";
+
 import { fabric } from "fabric";
 export const useFabricCanvas = () => {
   const canvas = React.useContext(FabricContext);
@@ -12,6 +13,7 @@ export const useFabricCanvas = () => {
       width: element.parentNode.clientWidth,
       height: element.parentNode.clientHeight,
     });
+    window.canvas = canvas.current;
     canvas.current.add(
       new fabric.Rect({
         top: 100,
