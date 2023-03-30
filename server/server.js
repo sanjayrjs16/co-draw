@@ -100,4 +100,17 @@ io.on("connection", (socket) => {
     // socket.broadcast.emit("mouse_position_update", data);
     socket.to(roomName).emit("mouse_position_update", { coords, roomName, id });
   });
+
+  socket.on("OBJECT_ADD", function ({ roomName, object, userId }) {
+    console.log("inside server", roomName, userId);
+    socket.to(roomName).emit("OBJECT_ADD", { roomName, object, userId });
+  });
+
+  socket.on("OBJECT_MODIFY", function ({ roomName, object }) {
+    socket.to(roomName).emit("OBJECT_MODIFY", { roomName, object });
+  });
+
+  socket.on("OBJECT_REMOVE", function ({ roomName, object }) {
+    socket.to(roomName).emit("OOBJECT_REMOVE", { roomName, object });
+  });
 });

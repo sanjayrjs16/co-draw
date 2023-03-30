@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import fabric from "fabric";
+import { fabric } from "fabric";
 import { useFabricCanvas } from "@/hooks/useFabricCanvas";
 import { FabricContext } from "@/context/FabricContext";
 import {
+  ADD_EVENT,
+  handleObjectAdded,
   registerCanvasEvents,
   unRegisterCanvasEvents,
 } from "@/utils/canvas/events";
@@ -38,9 +40,43 @@ const Canvas = () => {
       }));
     });
   };
+
+  const handleAdd = (e) => {
+    handleObjectAdded(e, userData?.roomName);
+  };
+
+  const updateObjectOnCanvas = () => {
+    const socket = socketConnection.getSocketFunctions();
+    const canvas = canvasRef.current;
+    if (socket === null) return;
+    socket.on(ADD_EVENT, function ({ roomName, object, userId }) {
+      if (userData?.roomName === roomName) {
+        // Add the new object to the canvas
+
+        if (userId != socket.id && canvas) {
+          canvas.off("object:added");
+          if (object.type === "path") {
+            var path = new fabric.Path(object.path, {
+              strokeWidth: object.strokeWidth,
+              stroke: object.stroke,
+              fill: "",
+            });
+            canvas.add(path);
+            canvas.sendToBack(path);
+            canvas.renderAll();
+            console.log("adding back event listener", canvas, object);
+            canvas.on("object:added", handleAdd);
+          }
+        }
+      }
+    });
+  };
   useEffect(() => {
     if (canvasRef?.current) registerCanvasEvents(canvasRef, userData?.roomName);
-    if (userData?.connectionStatus) updateCursorPositionSocketEvent();
+    if (userData?.connectionStatus) {
+      updateCursorPositionSocketEvent();
+      updateObjectOnCanvas();
+    }
 
     return () => {
       unRegisterCanvasEvents(canvasRef, userData?.roomName);

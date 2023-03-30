@@ -13,6 +13,7 @@ export const useFabricCanvas = () => {
       width: element.parentNode.clientWidth,
       height: element.parentNode.clientHeight,
     });
+    window.canvas = canvas.current;
     canvas.current.add(
       new fabric.Rect({
         top: 100,
