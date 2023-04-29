@@ -122,6 +122,10 @@ const Share = () => {
     if (requestConnection) {
       establishConnection();
     }
+    return () => {
+      const socket = socketConnection.getSocketFunctions();
+      if (socket) socket.disconnect();
+    };
   }, [requestConnection]);
 
   const establishConnection = () => {
@@ -194,12 +198,22 @@ const Share = () => {
       setRoomData(roomData);
     });
   };
+  const handleDisconnect = () => {
+    const socket = socketConnection.getSocketFunctions();
+    if (socket) {
+      setUserData({});
+      socket.emit("leaveRoom");
+      socket.disconnect();
+    }
+  };
   return (
     <>
       {userData?.connectionStatus ? (
         <div style={{ display: "flex", flexDirection: "column" }}>
           Connected
-          <Button variant={"solid"}>Disconnect</Button>
+          <Button variant={"solid"} onClick={handleDisconnect}>
+            Disconnect
+          </Button>
           {roomData.map((member) => {
             return (
               <div>
